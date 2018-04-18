@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dillonsoftware.webservices.mybatis.mapper.UserMapper">
+
+	<select id="list" resultType="User">
+		select id, name
+		from Users
+	</select>
+
+	<select id="fetch" resultType="User">
+		select id, name
+		from Users
+		where id = #{userId, jdbcType=INTEGER}
+	</select>
+
+</mapper>
