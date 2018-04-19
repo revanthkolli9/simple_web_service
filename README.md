@@ -53,6 +53,6 @@ The app can be run from terminal using the Maven command:
   - add the ability to add a new user.
   - add the ability to delete a user.
 
-It's expected that unit tests will be added to verify all functionality updates.  
+It's expected that unit tests will be added to verify all functional updates.  
 
 Finally, add postman tests to verify the name search functionality - as well as adding and deleting users (happy path validations are fine for the Postman tests).
