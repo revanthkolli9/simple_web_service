@@ -25,7 +25,7 @@ The following REST endpoints are implemented:
 
 You can clone the project with:
 
-	git clone https://github.com/fazdevils/simple_web_service.git
+	git clone https://github.com/revanthkolli9/simple_web_service.git
 
 
 # Prerequisites

@@ -8,9 +8,9 @@
 	<packaging>war</packaging>
 
 	<scm>
-		<url>https://github.com/fazdevils/simple_web_service.git</url>
-		<connection>scm:git:https://github.com/fazdevils/simple_web_service.git</connection>
-		<developerConnection>scm:git:https://github.com/fazdevils/simple_web_service.git</developerConnection>
+		<url>https://github.com/revanthkolli9/simple_web_service.git</url>
+		<connection>scm:git:https://github.com/revanthkolli9/simple_web_service.git</connection>
+		<developerConnection>scm:git:https://github.com/revanthkolli9/simple_web_service.git</developerConnection>
 	</scm>
 
 	<dependencies>
