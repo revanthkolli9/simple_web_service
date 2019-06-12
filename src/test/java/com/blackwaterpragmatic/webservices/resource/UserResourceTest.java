@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -83,6 +85,40 @@ public class UserResourceTest {
 		assertEquals(expectedResponse, response.getContentAsString());
 	}
 
+
+	@Test
+	public void should_list_users_alphabetically() throws URISyntaxException, IOException {
+		final Dispatcher dispatcher = MockHelper.createMockDispatcher(userResource);
+
+		final String searchTerm = null;
+		final List<User> expectedUsers = new ArrayList<User>() {
+			{
+				add(UserFixture.createUser(1, "Yoda"));
+				add(UserFixture.createUser(2, "Lando"));
+				add(UserFixture.createUser(3, "Han Solo"));
+				add(UserFixture.createUser(4, "Chewbaca"));
+			}
+		};
+
+		final CollectionType resultType = TypeFactory.defaultInstance().constructCollectionType(List.class, User.class);
+		final List<User> expectedSortedUsers = expectedUsers.stream().sorted(Comparator.comparing(User::getName)).collect(Collectors.toList());
+		final String expectedResponse = new ObjectMapper().writer().forType(resultType).writeValueAsString(expectedSortedUsers);
+
+		when(userService.listUsers(searchTerm)).thenReturn(expectedUsers); // the mapper returns unsorted collection
+
+		final MockHttpRequest request = MockHttpRequest.get("/users");
+		final MockHttpResponse response = new MockHttpResponse();
+
+		dispatcher.invoke(request, response);
+
+		verify(userService).listUsers(searchTerm);
+		verifyNoMoreInteractions(MockHelper.allDeclaredMocks(this));
+
+		assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+		assertEquals(expectedResponse, response.getContentAsString());
+	}
+
+
 	@Test
 	public void should_get_user() throws URISyntaxException, IOException {
 		final Dispatcher dispatcher = MockHelper.createMockDispatcher(userResource);
@@ -107,6 +143,7 @@ public class UserResourceTest {
 		assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 		assertEquals(expectedResponse, response.getContentAsString());
 	}
+
 
 	@Test
 	public void should_not_get_missing_user() throws URISyntaxException, IOException {
@@ -133,36 +170,6 @@ public class UserResourceTest {
 
 
 	@Test
-	public void should_list_matching_users() throws Exception {
-		final Dispatcher dispatcher = MockHelper.createMockDispatcher(userResource);
-
-		final String searchTerm = "Sky";
-
-		final List<User> expectedUsers = new ArrayList<User>() {
-			{
-				add(UserFixture.createUser(1, "Luke Skywalker"));
-				add(UserFixture.createUser(5, "Anakin Skywalker"));
-			}
-		};
-
-		final CollectionType resultType = TypeFactory.defaultInstance().constructCollectionType(List.class, User.class);
-		final String expectedResponse = new ObjectMapper().writer().forType(resultType).writeValueAsString(expectedUsers);
-
-		when(userService.listUsers(searchTerm)).thenReturn(expectedUsers);
-
-		final MockHttpRequest request = MockHttpRequest.get("/users?name=" + searchTerm);
-		final MockHttpResponse response = new MockHttpResponse();
-
-		dispatcher.invoke(request, response);
-
-		verify(userService).listUsers(searchTerm);
-		verifyNoMoreInteractions(MockHelper.allDeclaredMocks(this));
-
-		assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-		assertEquals(expectedResponse, response.getContentAsString());
-	}
-
-	@Test
 	public void should_return_empty_list_when_no_matching_users() throws Exception {
 		final Dispatcher dispatcher = MockHelper.createMockDispatcher(userResource);
 
@@ -186,6 +193,7 @@ public class UserResourceTest {
 		assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 		assertEquals(expectedResponse, response.getContentAsString());
 	}
+
 
 	@Test
 	public void should_return_new_user() throws UserAlreadyExistsException, JsonProcessingException, URISyntaxException {
@@ -213,6 +221,7 @@ public class UserResourceTest {
 		assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 		assertEquals(expectedResponse, response.getContentAsString());
 	}
+
 
 	@Test
 	public void should_return_bad_request_when_creating_user_already_exists() throws UserAlreadyExistsException,
@@ -245,6 +254,7 @@ public class UserResourceTest {
 
 	}
 
+
 	@Test
 	public void should_delete_user_and_ok() throws JsonProcessingException, URISyntaxException, UserNotFoundException {
 		final Dispatcher dispatcher = MockHelper.createMockDispatcher(userResource);
@@ -264,6 +274,7 @@ public class UserResourceTest {
 		assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 		assertEquals("1", response.getContentAsString());
 	}
+
 
 	@Test
 	public void should_return_not_found_when_deleting_invalid_user() throws UserNotFoundException, URISyntaxException,

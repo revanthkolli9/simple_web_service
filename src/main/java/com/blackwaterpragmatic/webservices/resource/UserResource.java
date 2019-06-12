@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -31,7 +33,9 @@ public class UserResource {
 	@GET
 	@Produces("application/json;charset=utf-8")
 	public Response getUsers(@QueryParam("name") final String name) {
-		final List<User> users = userService.listUsers(name);
+		final List<User> users = userService.listUsers(name).stream()
+				.sorted(Comparator.comparing(User::getName))
+				.collect(Collectors.toList());
 
 		return users.isEmpty() ?
 				responseBuilder.notFound() : responseBuilder.ok(users);
