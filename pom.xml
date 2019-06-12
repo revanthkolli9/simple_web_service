@@ -80,6 +80,13 @@
 			<version>${resteasy.version}</version>
 		</dependency>
 		
+		<!-- Libraries -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>27.1-jre</version>
+		</dependency>
+
 		<!-- Database -->
 		<dependency>
 			<groupId>org.mybatis</groupId>

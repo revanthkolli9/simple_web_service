@@ -7,6 +7,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class Error {
 	private String message;
 
+	public Error() {
+	}
+
+	public Error(final String message) {
+		this.message = message;
+	}
+
 	public String getMessage() {
 		return message;
 	}
