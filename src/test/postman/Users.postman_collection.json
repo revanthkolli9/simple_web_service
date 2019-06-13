@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "587c743c-4eed-4a45-9223-10d482c189cf",
+		"_postman_id": "2b831700-1321-4018-8e46-9fd757d00a6c",
 		"name": "Users",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,24 +12,42 @@
 					"listen": "test",
 					"script": {
 						"id": "ca05b0b4-dc59-4371-a323-ee5e63d02465",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
+							"pm.test(\"should be sorted\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    let isSorted = true;",
+							"    ",
+							"    for(let i = 0 ; i < jsonData.length - 1 ; i++){",
+							"        if(jsonData[i].name > jsonData[i+1].name) {",
+							"            isSorted = false;",
+							"            break;",
+							"        }",
+							"    }",
+							"    pm.expect(isSorted).to.eql(true);",
+							"});",
+							"",
 							"let jsonData = pm.response.json();",
 							"let firstUser =_.head(jsonData);",
+							"",
 							"pm.environment.set(\"user_id\", firstUser.id );",
+							"pm.environment.set(\"user_name\", firstUser.name );",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "localhost:8080/users",
 					"host": [
@@ -50,7 +68,6 @@
 					"listen": "test",
 					"script": {
 						"id": "fb767581-6e9f-42bb-af2d-95a15b1c1375",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -62,19 +79,177 @@
 							"",
 							"    let userId = pm.environment.get(\"user_id\");",
 							"    pm.expect(jsonData.id).to.eql(userId);",
-							"",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "localhost:8080/users/{{user_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users by name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca05b0b4-dc59-4371-a323-ee5e63d02465",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"it should return an array with a match\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    let user = jsonData[0];",
+							"    let userId = pm.environment.get(\"user_id\");",
+							"    let userName = pm.environment.get(\"user_name\");",
+							"    ",
+							"    pm.expect(user.id).to.eql(userId);",
+							"    pm.expect(user.name).to.eql(userName);",
+							"",
+							"    pm.environment.unset(\"user_name\");",
+							"    pm.environment.unset(\"user_id\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/users?name={{user_name}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "{{user_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9b332b73-d759-4ecb-9401-29f2bd3a6daa",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"it should return a new user\", function () {",
+							"    let jsonData = pm.response.json();",
+							"",
+							"    pm.expect(jsonData.name).to.eql(\"Chewbaca\");",
+							"    pm.expect(jsonData).to.have.property(\"id\")",
+							"    pm.environment.set(\"user_id\", jsonData.id );",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Chewbaca\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "77c9a837-401c-4edb-9cf7-2facd672273c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"it should return the deleted user id\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    let userId = pm.environment.get(\"user_id\");",
+							"    ",
+							"    pm.expect(jsonData).to.eql(userId);",
+							"    pm.environment.unset(\"user_id\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/{{user_id}}",
+					"protocol": "http",
 					"host": [
 						"localhost"
 					],
